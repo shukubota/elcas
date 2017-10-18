@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from numpy.random import *
 import time
 
-def calc(nw):
+def calc(nw,a,type=1):
 	
 	#node数
 	N=len(nw)
@@ -14,20 +14,22 @@ def calc(nw):
 	#link数
 	K=0
 	for i in range(0,len(nw)):
-		K+=len(nw[i])
+		K+=len(nw[i])+a
 	
 
 	#重み付け確率
 	plist=[]
-	for i in range(0,len(nw)):
-		plist.append(len(nw[i])/float(K))
-	
-	#print 	plist
+	if type==1:
+		for i in range(0,len(nw)):
+			plist.append((len(nw[i])+a)/float(K))
+	else:
+		for i in range(0,len(nw)):
+			plist.append(1./len(nw))
 
+	
 	
 	#linkを追加するnodeのindex番号
 	index=choice(range(0,N),m,replace=False,p=plist)
-	#print index			
 
 
 	for i in index:
@@ -35,13 +37,7 @@ def calc(nw):
 		
 	nw.append(sorted(list(index)))
 
-	#print nw
 
-
-def plot(x,y):	
-	plt.xscale("log")
-	plt.yscale("log")
-	plt.plot(x,y,"o",ms=2)
 
 
 
@@ -56,31 +52,16 @@ def dist(nw):
 				count+=1
 		y.append(count)
 	y=np.array(y)
-	a=float(len(nw))
-	y=y/a
+	b=float(len(nw))
+	y=y/b
 
 	x2=x
 
 	y2=2.*m*(m+1)/(x*x*x)
 
-	plt.xlabel("k")
-	plt.ylabel("P(k)")
-	plot(x,y,)
-	plot(x,y2)
-	#plt.show()
-	plt.xlim(0,10000)
-	plt.savefig("fig.eps")
-
-
-def testfunc():
-	x=np.arange(0,100,0.1)
-	y=x*x*x
-	plot(x,y)
-	plt.show()
-
-	return x,y
-
-
+	np.save("x.npy",x)
+	np.save("y.npy",y)
+	np.save("y2.npy",y2)
 
 
 def comgra(m):
@@ -107,7 +88,10 @@ if __name__=='__main__':
 	m=4
 	K0=m*(m-1)
 	N0=m
-	Nmax=20000
+	Nmax=1000
+	a=10.
+
+
 
 	#node数mの完全グラフ
 	nw=comgra(m)
@@ -116,10 +100,18 @@ if __name__=='__main__':
 	#Nmax回m本の枝を持つnodeを追加する
 	for j in range(0,Nmax):
 		print j
-		calc(nw)
+		#重み付け確率でシミュレーション
+		calc(nw,a,1)
+		#一様確率でシミュレーション
+		#calc(nw,a,2)
+	
+	np.save("nwdata.npy",nw)
+		
 
-	#分布をかく
+
+	#分布を計算する
 	dist(nw)
+	#print nw
 
 	elapsed_time=time.time()-start
 	print "elapsed time",elapsed_time
