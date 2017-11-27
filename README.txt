@@ -1,1 +1,3 @@
-test
+作業ごとにmasterからnew branchをきる
+Branchの名前は作業者の名前を入れる
+個人でmasterにmergeする
